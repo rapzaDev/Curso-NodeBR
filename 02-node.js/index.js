@@ -1,20 +1,29 @@
+const util = require('util')
+const obterEnderecoAsync = util.promisify(obterEndereco)
+
 function obterUsuario (callback) {
-    setTimeout(() => {
-        return callback(null,{
-            id: 1,
-            nome: 'Aladin',
-            dataNascimento : new Date()
-        })
-    }, 1000)
+    return new Promise( (resolve, reject) => {
+        setTimeout(() => {
+            return resolve({
+                id: 1,
+                nome: 'Aladin',
+                dataNascimento : new Date()
+            })
+        }, 1000)
+
+    })
+    
 }
 
-function obterTelefone (userId, callback) {
-    setTimeout(() => {
-        return callback(null, {
-            telefone: '96000067',
-            ddd: 79
-        })
-    }, 2000)
+function obterTelefone (userId) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            return resolve({
+                telefone: '96000067',
+                ddd: 79
+            })
+        }, 2000)
+    })
 }
 
 function obterEndereco (userId, callback) {
@@ -55,7 +64,39 @@ obterUsuario(function resolverUsuario(erro, usuario) {
 
      
 })
-// const telefone = obterTelefone(usuario.id)
-// const endereco = obterEndereco(usuario.id)
 
-// console.log('telefone', telefone)
+const usuarioPromise = obterUsuario()
+
+usuarioPromise
+    .then((usuario) => {
+        return obterTelefone(usuario.id)
+            .then((resultado) => {
+                return {
+                    usuario: {
+                        nome: usuario.nome,
+                        id: usuario.id
+                    },
+                    telefone: resultado
+                }
+            })
+    })
+    .then((data) => {
+        const endereco = obterEnderecoAsync(data.usuario.id)
+        return endereco.then( (resultado) => {
+            return  {
+                usuario: data.usuario,
+                telefone: data.telefone,
+                endereco: resultado
+            }
+        })
+    })
+    .then((data) => {
+        console.log(`
+            Nome: ${data.usuario.nome}
+            Endereco: ${data.endereco.rua}, ${data.endereco.numero}
+            Telefone: (${data.telefone.ddd}) ${data.telefone.telefone}
+        `)
+    })
+    .catch((error => {
+        console.log('Deu ruim', error)
+    }))
