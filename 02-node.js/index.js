@@ -65,38 +65,66 @@ obterUsuario(function resolverUsuario(erro, usuario) {
      
 })
 
-const usuarioPromise = obterUsuario()
+main()
+async function main () {
+    try {
+        console.time('medida-promise')
 
-usuarioPromise
-    .then((usuario) => {
-        return obterTelefone(usuario.id)
-            .then((resultado) => {
-                return {
-                    usuario: {
-                        nome: usuario.nome,
-                        id: usuario.id
-                    },
-                    telefone: resultado
-                }
-            })
-    })
-    .then((data) => {
-        const endereco = obterEnderecoAsync(data.usuario.id)
-        return endereco.then( (resultado) => {
-            return  {
-                usuario: data.usuario,
-                telefone: data.telefone,
-                endereco: resultado
-            }
-        })
-    })
-    .then((data) => {
+        const usuario = await obterUsuario()
+        // const telefone = await obterTelefone(usuario.id)
+        // const endereco = await obterEnderecoAsync(usuario.id)
+        const resultado = await Promise.all([
+            obterTelefone(usuario.id),
+            obterEnderecoAsync(usuario.id)
+        ])
+
+        const endereco = resultado[1]
+        const telefone = resultado[0]
+
         console.log(`
-            Nome: ${data.usuario.nome}
-            Endereco: ${data.endereco.rua}, ${data.endereco.numero}
-            Telefone: (${data.telefone.ddd}) ${data.telefone.telefone}
+            Nome: ${usuario.nome}
+            Telefone: (${telefone.ddd}) ${telefone.telefone}
+            Endereco: ${endereco.rua}, ${endereco.numero}
         `)
-    })
-    .catch((error => {
-        console.log('Deu ruim', error)
-    }))
+
+        console.timeEnd('medida-promise')
+    } catch (error) {
+        console.error('Deu ruim', error)
+    }
+}
+
+// const usuarioPromise = obterUsuario()
+
+// usuarioPromise
+//     .then((usuario) => {
+//         return obterTelefone(usuario.id)
+//             .then((resultado) => {
+//                 return {
+//                     usuario: {
+//                         nome: usuario.nome,
+//                         id: usuario.id
+//                     },
+//                     telefone: resultado
+//                 }
+//             })
+//     })
+//     .then((data) => {
+//         const endereco = obterEnderecoAsync(data.usuario.id)
+//         return endereco.then( (resultado) => {
+//             return  {
+//                 usuario: data.usuario,
+//                 telefone: data.telefone,
+//                 endereco: resultado
+//             }
+//         })
+//     })
+//     .then((data) => {
+//         console.log(`
+//             Nome: ${data.usuario.nome}
+//             Endereco: ${data.endereco.rua}, ${data.endereco.numero}
+//             Telefone: (${data.telefone.ddd}) ${data.telefone.telefone}
+//         `)
+//     })
+//     .catch((error => {
+//         console.log('Deu ruim', error)
+//     }))
