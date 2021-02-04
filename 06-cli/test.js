@@ -35,4 +35,12 @@ describe('Suite de manipulação de Herois', () => {
 
         deepStrictEqual(actual, expected)
     })
+
+    it('Deve excluir um heroi por id, usando arquivos', async () => {
+        const expected = true;
+
+        const resultado = await database.deletarHeroi(DEFAULT_ITEM_CADASTRAR.id)
+
+        deepStrictEqual(resultado, expected)
+    })
 })

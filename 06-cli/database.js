@@ -47,6 +47,22 @@ class Database {
         
         return dadosFiltrados
     }
+
+    async deletarHeroi (id) {        
+        if ( !id ) 
+        return await this.escreverArquivo([]);
+
+        const dados = await this.obterDadosArquivo()
+
+        const indice = dados.findIndex(heroi => heroi.id === parseInt(id))
+
+        if ( indice === -1 )  
+        throw new Error('[ id ] invalido! Seu heroi não existe.')
+
+        dados.splice(indice,1)
+
+        return await this.escreverArquivo(dados)
+    }
 }
 
 module.exports = new Database()
