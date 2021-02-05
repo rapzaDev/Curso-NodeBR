@@ -11,7 +11,7 @@ async function main() {
 
         .option('-c, --cadastrar', "Cadastrar um Heroi")
         .option('-l, --listar', "Listar um Heroi")
-        .option('-r, --remover [value]', "Remove um Heroi pelo id")
+          .option('-r, --remover [value]', "Remove um Heroi pelo id")
         .option('-a, --atualizar [value]', "Atualiza um Heroi pelo id")
         
         Commander.parse(process.argv)
